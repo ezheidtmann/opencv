@@ -1360,7 +1360,7 @@ bool DTreesImpl::cutTree( int root, double T, int fold, double min_alpha )
     return false;
 }
 
-float DTreesImpl::predictTrees( const Range& range, const Mat& sample, int flags ) const
+float DTreesImpl::predictTrees( const Range& range, const Mat& sample, int flags, OutputArray _confidences ) const
 {
     CV_Assert( sample.type() == CV_32F );
 
@@ -1487,6 +1487,28 @@ float DTreesImpl::predictTrees( const Range& range, const Mat& sample, int flags
         sum = (flags & RAW_OUTPUT) ? (float)best_idx : classLabels[best_idx];
     }
 
+    if( predictType == PREDICT_CONFIDENCE )
+    {
+        if (!_confidences.needed()) {
+            Mat confidences = _confidences.getMat();
+            // put votes into confidences, normalized
+            float totalVotes = 0;
+            for (int voteIdx = 0; voteIdx < nclasses; ++voteIdx) {
+                totalVotes += votes[voteIdx];
+            }
+            if (totalVotes < 1) {
+                totalVotes = 1;
+            }
+            for (int voteIdx = 0; voteIdx < nclasses; ++voteIdx) {
+                confidences.at<float>(voteIdx) = votes[voteIdx] / totalVotes;
+            }
+        }
+        else {
+            // TODO: error
+        }
+        sum = 1;
+    }
+
     return (float)sum;
 }
 
@@ -1527,6 +1549,29 @@ float DTreesImpl::predict( InputArray _samples, OutputArray _results, int flags 
             retval = val;
     }
     return retval;
+}
+
+
+void DTreesImpl::predictProb( InputArray _samples, OutputArray _results, int flags) const
+{
+    CV_Assert( !roots.empty() );
+    Mat samples = _samples.getMat(), results;
+    int i, nsamples = samples.rows;
+    int rtype = CV_32F;
+    bool needresults = _results.needed();
+
+    int treeFlags = ( flags & ~PREDICT_MASK ) & PREDICT_CONFIDENCE;
+
+    if( needresults )
+    {
+        _results.create(nsamples, classLabels.size(), rtype);
+        results = _results.getMat();
+    }
+
+    for( i = 0; i < nsamples; i++ )
+    {
+        predictTrees( Range(0, (int)roots.size()), samples.row(i), treeFlags, results.row(i) );
+    }
 }
 
 void DTreesImpl::writeTrainingParams(FileStorage& fs) const

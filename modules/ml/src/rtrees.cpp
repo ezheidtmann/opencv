@@ -389,6 +389,11 @@ public:
         return impl.predict(samples, results, flags);
     }
 
+    void predictProb( InputArray samples, OutputArray results, int flags ) const
+    {
+        return impl.predictProb(samples, results, flags);
+    }
+
     void write( FileStorage& fs ) const
     {
         impl.write(fs);

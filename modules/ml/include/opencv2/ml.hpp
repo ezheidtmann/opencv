@@ -930,7 +930,7 @@ class CV_EXPORTS_W DTrees : public StatModel
 {
 public:
     /** Predict options */
-    enum Flags { PREDICT_AUTO=0, PREDICT_SUM=(1<<8), PREDICT_MAX_VOTE=(2<<8), PREDICT_MASK=(3<<8) };
+    enum Flags { PREDICT_AUTO=0, PREDICT_SUM=(1<<8), PREDICT_MAX_VOTE=(2<<8), PREDICT_CONFIDENCE=(4<<8), PREDICT_MASK=(7<<8) };
 
     /** Cluster possible values of a categorical variable into K\<=maxCategories clusters to
     find a suboptimal split.
@@ -1147,6 +1147,8 @@ public:
     returned.
      */
     CV_WRAP virtual Mat getVarImportance() const = 0;
+
+    CV_WRAP virtual void predictProb( InputArray samples, OutputArray results=noArray(), int flags=0 ) const = 0;
 
     /** Creates the empty model.
     Use StatModel::train to train the model, StatModel::train to create and train the model,

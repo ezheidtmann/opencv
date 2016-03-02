@@ -323,8 +323,9 @@ namespace ml
 
         virtual double updateTreeRNC( int root, double T, int fold );
         virtual bool cutTree( int root, double T, int fold, double min_alpha );
-        virtual float predictTrees( const Range& range, const Mat& sample, int flags ) const;
+        virtual float predictTrees( const Range& range, const Mat& sample, int flags, OutputArray confidences = noArray() ) const;
         virtual float predict( InputArray inputs, OutputArray outputs, int flags ) const;
+        virtual void predictProb( InputArray inputs, OutputArray outputs, int flags ) const;
 
         virtual void writeTrainingParams( FileStorage& fs ) const;
         virtual void writeParams( FileStorage& fs ) const;
