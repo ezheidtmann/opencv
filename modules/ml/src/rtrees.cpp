@@ -394,6 +394,11 @@ public:
         return impl.predictProb(samples, results, flags);
     }
 
+    Mat getClassLabels() const
+    {
+        return Mat(impl.classLabels);
+    }
+
     void write( FileStorage& fs ) const
     {
         impl.write(fs);

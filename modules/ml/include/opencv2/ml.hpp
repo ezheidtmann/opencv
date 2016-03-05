@@ -1150,6 +1150,8 @@ public:
 
     CV_WRAP virtual void predictProb( InputArray samples, OutputArray results=noArray(), int flags=0 ) const = 0;
 
+    CV_WRAP virtual Mat getClassLabels() const = 0;
+
     /** Creates the empty model.
     Use StatModel::train to train the model, StatModel::train to create and train the model,
     Algorithm::load to load the pre-trained model.

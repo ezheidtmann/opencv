@@ -1360,6 +1360,9 @@ bool DTreesImpl::cutTree( int root, double T, int fold, double min_alpha )
     return false;
 }
 
+#include <iostream>
+using namespace std;
+
 float DTreesImpl::predictTrees( const Range& range, const Mat& sample, int flags, OutputArray _confidences ) const
 {
     CV_Assert( sample.type() == CV_32F );
@@ -1393,7 +1396,7 @@ float DTreesImpl::predictTrees( const Range& range, const Mat& sample, int flags
             PREDICT_SUM : PREDICT_MAX_VOTE;
     }
 
-    if( predictType == PREDICT_MAX_VOTE )
+    if( predictType == PREDICT_MAX_VOTE || predictType == PREDICT_CONFIDENCE )
     {
         for( i = 0; i < nclasses; i++ )
             votes[i] = 0;
@@ -1489,22 +1492,17 @@ float DTreesImpl::predictTrees( const Range& range, const Mat& sample, int flags
 
     if( predictType == PREDICT_CONFIDENCE )
     {
-        if (!_confidences.needed()) {
-            Mat confidences = _confidences.getMat();
-            // put votes into confidences, normalized
-            float totalVotes = 0;
-            for (int voteIdx = 0; voteIdx < nclasses; ++voteIdx) {
-                totalVotes += votes[voteIdx];
-            }
-            if (totalVotes < 1) {
-                totalVotes = 1;
-            }
-            for (int voteIdx = 0; voteIdx < nclasses; ++voteIdx) {
-                confidences.at<float>(voteIdx) = votes[voteIdx] / totalVotes;
-            }
+        Mat confidences = _confidences.getMat();
+        // put votes into confidences, normalized
+        float totalVotes = 0;
+        for (int voteIdx = 0; voteIdx < nclasses; ++voteIdx) {
+            totalVotes += votes[voteIdx];
         }
-        else {
-            // TODO: error
+        if (totalVotes < 1) {
+            totalVotes = 1;
+        }
+        for (int voteIdx = 0; voteIdx < nclasses; ++voteIdx) {
+            confidences.at<float>(voteIdx) = votes[voteIdx] / totalVotes;
         }
         sum = 1;
     }
@@ -1560,7 +1558,7 @@ void DTreesImpl::predictProb( InputArray _samples, OutputArray _results, int fla
     int rtype = CV_32F;
     bool needresults = _results.needed();
 
-    int treeFlags = ( flags & ~PREDICT_MASK ) & PREDICT_CONFIDENCE;
+    int treeFlags = ( flags & ~PREDICT_MASK ) | PREDICT_CONFIDENCE;
 
     if( needresults )
     {
