@@ -688,7 +688,7 @@ DTreesImpl::WSplit DTreesImpl::findSplitOrdClass( int vi, const vector<int>& _si
         rsum2 -= 2*rv*wval - w2;
         lcw[idx] = lv + wval; rcw[idx] = rv - wval;
 
-        if( (values[next]/values[curr] - 1.f) > epsilon )
+        if( fabsf(values[next]/values[curr] - 1.f) > epsilon )
         {
             double val = (lsum2*R + rsum2*L)/(L*R);
             if( best_val < val )
