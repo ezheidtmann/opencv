@@ -638,7 +638,7 @@ void DTreesImpl::calcValue( int nidx, const vector<int>& _sidx )
 
 DTreesImpl::WSplit DTreesImpl::findSplitOrdClass( int vi, const vector<int>& _sidx, double initQuality )
 {
-    const double epsilon = FLT_EPSILON*4;
+    const double epsilon = FLT_EPSILON*2;
     int n = (int)_sidx.size();
     int m = (int)classLabels.size();
 
@@ -688,7 +688,7 @@ DTreesImpl::WSplit DTreesImpl::findSplitOrdClass( int vi, const vector<int>& _si
         rsum2 -= 2*rv*wval - w2;
         lcw[idx] = lv + wval; rcw[idx] = rv - wval;
 
-        if( values[curr] + epsilon < values[next] )
+        if( (values[next]/values[curr] - 1.f) > epsilon )
         {
             double val = (lsum2*R + rsum2*L)/(L*R);
             if( best_val < val )
