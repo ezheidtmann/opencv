@@ -139,7 +139,7 @@ namespace ml
         {
             if( val < 0 )
                 CV_Error( CV_StsOutOfRange, "max_depth should be >= 0" );
-            maxDepth = std::min( val, 25 );
+            maxDepth = val;
         }
         inline void setMinSampleCount(int val)
         {
